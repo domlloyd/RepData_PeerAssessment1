@@ -16,7 +16,8 @@ can be found in the README accompanying at the following Github repository link
 
 Before running the report we will need to source the various R libraries used to produce the report
 
-```{r}
+
+```r
 # This script uses:
 # - the "readr" library for fast reading of files using read_table
 # - the "dplyr" library for summarising the data
@@ -28,7 +29,8 @@ library("stringr", quietly = TRUE, warn.conflicts = FALSE)
 
 And then we read the file of activity data, getting rid of NA values. 
 
-```{r}
+
+```r
 # the raw data has been unzipped to our RProject directory
 # We setwd to the project directory we have forked. 
 # NB If running this program make sure the raw data file
@@ -51,7 +53,6 @@ activity_all_na    <- filter(activity_all, is.na(steps))
 # pad the time taken from interval field
 activity_all_valid$time <- str_pad(as.character(activity_all_valid$interval), width = 4, side = "left", pad = "0")
 #activity_all_valid$datetime <- strptime(paste(activity_all_valid$date, activity_all_valid$time), '%Y-%m-%d %H%M')
-
 ```
 
 
@@ -62,66 +63,57 @@ activity_all_valid$time <- str_pad(as.character(activity_all_valid$interval), wi
 
 First we will build a data table with the total number of steps per day
 
-``` {r}
+
+```r
 # work out the total number of steps per day
 total_steps_per_day <- summarise(group_by(activity_all_valid, date),
                                  sum_steps = sum(steps))
-
 ```
 
 
 Then we can plot a histogram of the total number of steps over the activity days.
 
-```{r, echo=FALSE}
-# and plot the total number of steps per day on a histogram
-x <- total_steps_per_day$sum_steps
-xlab <- ""
-# make sure to convert the date to POSIXlt
-y <- strptime(total_steps_per_day$date, '%Y-%m-%d')
-ylab <- "Total number of steps"
-main_title <- "Total number of steps per day"
-plot(y, x, type = 'h',xlab = xlab, ylab = ylab, main = main_title)
-```
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
 
 
 The mean number of steps per day is: 
 
-``` {r, echo=F}
-round(mean(total_steps_per_day$sum_steps), digits = 0)
+
+```
+## [1] 10766
 ```
 
 and the median number of steps is: 
-``` {r,echo=F}
-median(total_steps_per_day$sum_steps)
+
+```
+## [1] 10765
 ```
 
 
 ## What is the average daily activity pattern?
 The following graph shows the average daily activity pattern by taking the averages across all days for the five minute periods. 
-```{r, echo=FALSE}
-# summarise  by the time segment to get the average daily activity pattern
-steps <- as.numeric(activity_all_valid$steps)
-times <- as.character(activity_all_valid$time)
-new_activity_all_valid = cbind.data.frame(steps,times)
-summary_adap <- summarise(group_by(new_activity_all_valid, times), mean_steps = mean(steps))
-plot(as.character(summary_adap$times), as.numeric(summary_adap$mean_steps), type = "l", xlab = "time of day", ylab = "average number of steps")
-```
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
 
 From the graph we can see the maximum number of steps occurring in a 5 minute interval in an average day is: 
-```{r, echo=FALSE}
-max(summary_adap$mean_steps)
-max_steps_in_adap <- max(summary_adap$mean_steps)
+
+```
+## [1] 206.1698
 ```
 And this peak number of steps occurs at
-```{r, echo=FALSE}
-filter(summary_adap, mean_steps == max_steps_in_adap)
+
+```
+## Source: local data frame [1 x 2]
+## 
+##   times mean_steps
+## 1  0835   206.1698
 ```
 
 
 
 ## Imputing missing values
 
-```{r}
+
+```r
 averages <- aggregate(x=list(steps=activity_all$steps), by=list(interval=activity_all$interval),
                       FUN=mean, na.rm=TRUE)
 merged <- merge.data.frame(activity_all_na,averages, by = c("interval"))
