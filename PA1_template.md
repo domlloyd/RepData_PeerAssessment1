@@ -112,6 +112,8 @@ And this peak number of steps occurs at
 
 ## Imputing missing values
 
+We have come up with a method for filling in NA values with the average number of steps at interval
+
 
 ```r
 averages <- aggregate(x=list(steps=activity_all$steps), by=list(interval=activity_all$interval),
@@ -121,8 +123,52 @@ activity_all_na$steps <- merged$steps.y
 final_data = rbind.data.frame(activity_all_na,activity_all_valid2)
 ```
 
+Redo the sums from the original set 0f graphs. 
+
+
+```r
+# work out the total number of steps per day
+total_steps_per_day2 <- summarise(group_by(final_data, date),
+                                 sum_steps = sum(steps))
+```
+
+
+Then we can plot a histogram of the total number of steps over the activity days.
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
+
+
+The mean number of steps per day is: 
+
+
+```
+## [1] 10766
+```
+
+and the median number of steps is: 
+
+```
+## [1] 11015
+```
+The median number of steps has gone higher because we have more values taken in to consideration in the calculation. 
+
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+
+```r
+final_data$day <- weekdays(strptime(final_data$date,'%Y-%m-%d'))
+weekday_weekend <- function(day) {
+    if (day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"))
+        return("weekday")
+    else if (day %in% c("Saturday", "Sunday"))
+        return("weekend")
+    else
+        stop("invalid date")
+}
+final_data$weekend <- sapply(final_data$day, FUN=weekday_weekend)
+```
+  
+  
   

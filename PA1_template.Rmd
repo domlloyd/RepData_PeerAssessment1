@@ -121,6 +121,8 @@ filter(summary_adap, mean_steps == max_steps_in_adap)
 
 ## Imputing missing values
 
+We have come up with a method for filling in NA values with the average number of steps at interval
+
 ```{r}
 averages <- aggregate(x=list(steps=activity_all$steps), by=list(interval=activity_all$interval),
                       FUN=mean, na.rm=TRUE)
@@ -129,8 +131,67 @@ activity_all_na$steps <- merged$steps.y
 final_data = rbind.data.frame(activity_all_na,activity_all_valid2)
 ```
 
+Redo the sums from the original set 0f graphs. 
+
+``` {r}
+# work out the total number of steps per day
+total_steps_per_day2 <- summarise(group_by(final_data, date),
+                                 sum_steps = sum(steps))
+
+```
+
+
+Then we can plot a histogram of the total number of steps over the activity days.
+
+```{r, echo=FALSE}
+# and plot the total number of steps per day on a histogram
+x <- total_steps_per_day2$sum_steps
+xlab <- ""
+# make sure to convert the date to POSIXlt
+y <- strptime(total_steps_per_day2$date, '%Y-%m-%d')
+ylab <- "Total number of steps"
+main_title <- "Total number of steps per day"
+plot(y, x, type = 'h',xlab = xlab, ylab = ylab, main = main_title)
+```
+
+
+The mean number of steps per day is: 
+
+``` {r, echo=F}
+round(mean(total_steps_per_day2$sum_steps), digits = 0)
+```
+
+and the median number of steps is: 
+``` {r,echo=F}
+median(total_steps_per_day2$sum_steps)
+```
+The median number of steps has gone higher because we have more values taken in to consideration in the calculation. 
+
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+```{r}
+final_data$day <- weekdays(strptime(final_data$date,'%Y-%m-%d'))
+weekday_weekend <- function(day) {
+    if (day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"))
+        return("weekday")
+    else if (day %in% c("Saturday", "Sunday"))
+        return("weekend")
+    else
+        stop("not a good date")
+}
+final_data$weekend <- sapply(final_data$day, FUN=weekday_weekend)
+
+
+```
+  
+```{r, echo=F}
+
+# plot graph
+
+
+
+
+```  
   

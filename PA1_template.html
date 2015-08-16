@@ -287,6 +287,8 @@ total_steps_per_day &lt;- summarise(group_by(activity_all_valid, date),
 
 <h2>Imputing missing values</h2>
 
+<p>We have come up with a method for filling in NA values with the average number of steps at interval</p>
+
 <pre><code class="r">averages &lt;- aggregate(x=list(steps=activity_all$steps), by=list(interval=activity_all$interval),
                       FUN=mean, na.rm=TRUE)
 merged &lt;- merge.data.frame(activity_all_na,averages, by = c(&quot;interval&quot;))
@@ -294,7 +296,42 @@ activity_all_na$steps &lt;- merged$steps.y
 final_data = rbind.data.frame(activity_all_na,activity_all_valid2)
 </code></pre>
 
+<p>Redo the sums from the original set 0f graphs. </p>
+
+<pre><code class="r"># work out the total number of steps per day
+total_steps_per_day2 &lt;- summarise(group_by(final_data, date),
+                                 sum_steps = sum(steps))
+</code></pre>
+
+<p>Then we can plot a histogram of the total number of steps over the activity days.</p>
+
+<p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-12"/> </p>
+
+<p>The mean number of steps per day is: </p>
+
+<pre><code>## [1] 10766
+</code></pre>
+
+<p>and the median number of steps is: </p>
+
+<pre><code>## [1] 11015
+</code></pre>
+
+<p>The median number of steps has gone higher because we have more values taken in to consideration in the calculation. </p>
+
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+
+<pre><code class="r">final_data$day &lt;- weekdays(strptime(final_data$date,&#39;%Y-%m-%d&#39;))
+weekday_weekend &lt;- function(day) {
+    if (day %in% c(&quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;))
+        return(&quot;weekday&quot;)
+    else if (day %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;))
+        return(&quot;weekend&quot;)
+    else
+        stop(&quot;invalid date&quot;)
+}
+final_data$weekend &lt;- sapply(final_data$day, FUN=weekday_weekend)
+</code></pre>
 
 </body>
 
