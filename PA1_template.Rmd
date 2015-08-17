@@ -24,6 +24,7 @@ Before running the report we will need to source the various R libraries used to
 library("readr", quietly = TRUE, warn.conflicts = FALSE)
 library("dplyr", quietly = TRUE, warn.conflicts = FALSE)
 library("stringr", quietly = TRUE, warn.conflicts = FALSE)
+library("ggplot2", quietly = TRUE, warn.conflicts = FALSE)
 ```
 
 And then we read the file of activity data, getting rid of NA values. 
@@ -179,7 +180,7 @@ weekday_weekend <- function(day) {
     else if (day %in% c("Saturday", "Sunday"))
         return("weekend")
     else
-        stop("not a good date")
+        stop("not a valid day above")
 }
 final_data$weekend <- sapply(final_data$day, FUN=weekday_weekend)
 
@@ -189,7 +190,13 @@ final_data$weekend <- sapply(final_data$day, FUN=weekday_weekend)
 ```{r, echo=F}
 
 # plot graph
+steps <- as.numeric(final_data$steps)
+interval <- as.character(final_data$interval)
+daygroup <- as.character(final_data$weekend)
+final_activity_all_valid = cbind.data.frame(steps,interval,daygroup)
+summary_adap_weekends <- summarise(group_by(final_activity_all_valid, interval, daygroup), meanstep = mean(steps))
 
+ggplot(data=summary_adap_weekends, aes(x=interval, y=meanstep)) + geom_line(aes(group=daygroup)) + facet_grid(daygroup~.) + xlab("5 minute interval") + ylab("average number of steps")
 
 
 

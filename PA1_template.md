@@ -25,6 +25,7 @@ Before running the report we will need to source the various R libraries used to
 library("readr", quietly = TRUE, warn.conflicts = FALSE)
 library("dplyr", quietly = TRUE, warn.conflicts = FALSE)
 library("stringr", quietly = TRUE, warn.conflicts = FALSE)
+library("ggplot2", quietly = TRUE, warn.conflicts = FALSE)
 ```
 
 And then we read the file of activity data, getting rid of NA values. 
@@ -165,10 +166,10 @@ weekday_weekend <- function(day) {
     else if (day %in% c("Saturday", "Sunday"))
         return("weekend")
     else
-        stop("invalid date")
+        stop("not a valid day above")
 }
 final_data$weekend <- sapply(final_data$day, FUN=weekday_weekend)
 ```
   
-  
+![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png) 
   
